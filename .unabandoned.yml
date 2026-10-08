@@ -1,0 +1,29 @@
+schema: 1
+
+package: "@unabandoned/grunt-contrib-clean"
+
+upstream:
+  repo: gruntjs/grunt-contrib-clean
+  reason: "no release since 2.0.1 in April 2022; master only receives dependabot bumps to dev dependencies"
+
+summary: >-
+  Grunt task that deletes files and folders matched by glob patterns, refusing
+  to touch the working directory or anything outside it unless forced.
+
+why-forked: >-
+  CyberChef runs it in its build, and the last release still ships rimraf 2
+  (abandoned, deprecated) and async as runtime dependencies. Deletion now uses
+  Node's built-in fs.rm, so the fork has zero runtime dependencies; grunt stays
+  a peer dependency.
+
+used-by:
+  - consumer: TheTechNetwork/CyberChef
+    purpose: >-
+      the clean task in Gruntfile.js empties build/dev, build/prod and
+      build/node and deletes generated operation config before each dev, prod,
+      node and test-config build, and removes the intermediate standalone HTML
+      after it has been zipped
+
+status: active
+
+tags: [grunt, gruntplugin, build, clean, rm]

@@ -1,6 +1,16 @@
-# grunt-contrib-clean v2.0.1 [![Build Status](https://github.com/gruntjs/grunt-contrib-clean/workflows/Tests/badge.svg)](https://github.com/gruntjs/grunt-contrib-clean/actions?workflow=Tests)
+# grunt-contrib-clean
 
 > Clean files and folders
+
+> **This is a maintained fork of [grunt-contrib-clean][upstream], published as
+> [`@unabandoned/grunt-contrib-clean`][pkg].** Upstream's last release was 2.0.1
+> in 2022. The task name and options are unchanged; deletion now uses Node's
+> built-in `fs.rm` instead of `rimraf` and `async`, so the package has no
+> runtime dependencies. Requires Node.js 22.12 or newer. See
+> [.unabandoned.yml](.unabandoned.yml).
+
+[upstream]: https://github.com/gruntjs/grunt-contrib-clean
+[pkg]: https://www.npmjs.com/package/@unabandoned/grunt-contrib-clean
 
 
 
@@ -9,8 +19,10 @@
 If you haven't used [Grunt](https://gruntjs.com/) before, be sure to check out the [Getting Started](https://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](https://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
 ```shell
-npm install grunt-contrib-clean --save-dev
+npm install grunt-contrib-clean@npm:@unabandoned/grunt-contrib-clean --save-dev
 ```
+
+Installing it under the alias keeps the `grunt.loadNpmTasks('grunt-contrib-clean')` line below working unchanged.
 
 Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
