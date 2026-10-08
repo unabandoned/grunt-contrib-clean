@@ -8,14 +8,13 @@
 
 'use strict';
 
-var async = require('async');
-var rimraf = require('rimraf').rimraf;
+var fs = require('fs');
 
 module.exports = function(grunt) {
 
-  function clean(filepath, options, done) {
+  function clean(filepath, options) {
     if (!grunt.file.exists(filepath)) {
-      return done();
+      return Promise.resolve();
     }
 
     // Only delete cwd or outside cwd if --force enabled. Be careful, people!
@@ -23,22 +22,22 @@ module.exports = function(grunt) {
       if (grunt.file.isPathCwd(filepath)) {
         grunt.verbose.error();
         grunt.fail.warn('Cannot delete the current working directory.');
-        return done();
+        return Promise.resolve();
       } else if (!grunt.file.isPathInCwd(filepath)) {
         grunt.verbose.error();
         grunt.fail.warn('Cannot delete files outside the current working directory.');
-        return done();
+        return Promise.resolve();
       }
     }
 
     grunt.verbose.writeln((options['no-write'] ? 'Not actually cleaning ' : 'Cleaning ') + filepath + '...');
     // Actually delete. Or not.
     if (options['no-write']) {
-      return done();
+      return Promise.resolve();
     }
-    rimraf(filepath).then(function() {
-      done();
-    }).catch(function(err) {
+    // fs.rm removes symlinks themselves rather than following them, and
+    // retries transient EBUSY/EPERM/ENOTEMPTY errors as rimraf did.
+    return fs.promises.rm(filepath, { recursive: true, force: true, maxRetries: 3 }).catch(function(err) {
       grunt.log.error();
       grunt.fail.warn('Unable to delete "' + filepath + '" file (' + err.message + ').', err);
     });
@@ -53,14 +52,16 @@ module.exports = function(grunt) {
 
     var done = this.async();
 
-    // Clean specified files / dirs.
+    // Clean specified files / dirs, one at a time and in order.
     var files = this.filesSrc;
-    async.eachSeries(files, function (filepath, cb) {
-      clean(filepath, options, cb);
-    }, function (err) {
+    files.reduce(function(previous, filepath) {
+      return previous.then(function() {
+        return clean(filepath, options);
+      });
+    }, Promise.resolve()).then(function() {
       grunt.log.ok(files.length + ' ' + grunt.util.pluralize(files.length, 'path/paths') + ' cleaned.');
-      done(err);
-    });
+      done();
+    }, done);
   });
 
 };
